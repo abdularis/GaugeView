@@ -40,7 +40,8 @@ class LinearGaugeView : View {
     private val emptyBarPaint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val filledBarPaint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val path : Path = Path()
-    private val rect = Rect()
+    private val filledAreaRect = Rect()
+    private val emptyAreaRect = Rect()
     private var animator : ValueAnimator? = null
 
     var emptyColor : Int
@@ -84,11 +85,14 @@ class LinearGaugeView : View {
     }
 
     override fun onDraw(canvas: Canvas?) {
-        canvas?.drawPath(path, emptyBarPaint)
+        filledAreaRect.set(0, 0, (width * getCurrentNumberOffset()).toInt(), height)
+        emptyAreaRect.set(filledAreaRect.right, 0, width, height)
 
-        rect.set(0, 0, (width * getCurrentNumberOffset()).toInt(), height)
-        canvas?.clipRect(rect)
+        canvas?.clipRect(filledAreaRect)
         canvas?.drawPath(path, filledBarPaint)
+
+        canvas?.clipRect(emptyAreaRect, Region.Op.REPLACE)
+        canvas?.drawPath(path, emptyBarPaint)
     }
 
     private fun getCurrentNumberOffset() : Float {
