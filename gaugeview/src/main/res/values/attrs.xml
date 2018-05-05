@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="LinearGaugeView">
+    <declare-styleable name="GaugeView">
         <attr name="minNumber" format="integer"/>
         <attr name="maxNumber" format="integer"/>
         <attr name="currentNumber" format="integer"/>
+    </declare-styleable>
+    <declare-styleable name="LinearGaugeView">
         <attr name="emptyBarColor" format="color"/>
         <attr name="filledBarColor" format="color"/>
     </declare-styleable>
