@@ -9,33 +9,19 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 
-class LinearGaugeView : View {
+class LinearGaugeView : GaugeView {
 
-    private var _minNumber : Int = 0
-    var minNumber : Int
-        get() = _minNumber
+    override var currentNumber: Int
+        get() = super.currentNumber
         set(value) {
-            _minNumber = value
-            invalidate()
+            animateFilledBar(_currentNumber, value)
+            super.currentNumber = value
         }
-
-    private var _maxNumber : Int = 100
-    var maxNumber : Int
-        get() = _maxNumber
-        set(value) {
-            _maxNumber = value
-            invalidate()
-        }
+    override val currentNumberOffset: Float
+        get() = if (_animating) _currentNumberAnim / _maxNumber.toFloat() else _currentNumber / _maxNumber.toFloat()
 
     private var _animating = false
     private var _currentNumberAnim : Int = 0
-    private var _currentNumber : Int = 0
-    var currentNumber : Int
-        get() = _currentNumber
-        set(value) {
-            animateFilledBar(_currentNumber, value)
-            _currentNumber = Math.min(value, _maxNumber)
-        }
 
     private val emptyBarPaint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val filledBarPaint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -60,9 +46,6 @@ class LinearGaugeView : View {
     constructor(ctx : Context) : super(ctx)
     constructor(ctx : Context, attrs : AttributeSet) : super(ctx, attrs) {
         val a : TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.LinearGaugeView, 0, 0)
-        _minNumber = a.getInteger(R.styleable.LinearGaugeView_minNumber, _minNumber)
-        _maxNumber = a.getInteger(R.styleable.LinearGaugeView_maxNumber, _maxNumber)
-        _currentNumber = a.getInteger(R.styleable.LinearGaugeView_currentNumber, _currentNumber)
         emptyBarPaint.color = a.getColor(R.styleable.LinearGaugeView_emptyBarColor, Color.DKGRAY)
         filledBarPaint.color = a.getColor(R.styleable.LinearGaugeView_filledBarColor, Color.GRAY)
 
@@ -85,18 +68,16 @@ class LinearGaugeView : View {
     }
 
     override fun onDraw(canvas: Canvas?) {
-        filledAreaRect.set(0, 0, (width * getCurrentNumberOffset()).toInt(), height)
+        filledAreaRect.set(0, 0, (width * currentNumberOffset).toInt(), height)
         emptyAreaRect.set(filledAreaRect.right, 0, width, height)
 
+        canvas?.save()
         canvas?.clipRect(filledAreaRect)
         canvas?.drawPath(path, filledBarPaint)
 
-        canvas?.clipRect(emptyAreaRect, Region.Op.REPLACE)
+        canvas?.restore()
+        canvas?.clipRect(emptyAreaRect)
         canvas?.drawPath(path, emptyBarPaint)
-    }
-
-    private fun getCurrentNumberOffset() : Float {
-        return if (_animating) _currentNumberAnim / _maxNumber.toFloat() else _currentNumber / _maxNumber.toFloat()
     }
 
     private fun animateFilledBar(current : Int, new : Int) {
