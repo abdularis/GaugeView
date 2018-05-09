@@ -8,5 +8,7 @@
     <declare-styleable name="LinearGaugeView">
         <attr name="emptyBarColor" format="color"/>
         <attr name="filledBarColor" format="color"/>
+        <attr name="curveControlPointX" format="float"/>
+        <attr name="curveControlPointY" format="float"/>
     </declare-styleable>
 </resources>

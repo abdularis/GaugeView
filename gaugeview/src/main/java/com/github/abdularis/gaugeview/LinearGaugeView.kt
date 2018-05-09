@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.*
 import android.util.AttributeSet
-import android.view.View
 import android.view.animation.DecelerateInterpolator
 
 class LinearGaugeView : GaugeView {
@@ -43,12 +42,29 @@ class LinearGaugeView : GaugeView {
             filledBarPaint.color = value
             invalidate()
         }
+    private var _curveControlPointX: Float = 0.5f
+    var curveControlPointX: Float
+        get() = _curveControlPointX
+        set(value) {
+            _curveControlPointX = value
+            invalidate()
+        }
+
+    private var _curveControlPointY: Float = 0.5f
+    var curveControlPointY: Float
+        get() = _curveControlPointY
+        set(value) {
+            _curveControlPointY = value
+            invalidate()
+        }
 
     constructor(ctx : Context) : super(ctx)
     constructor(ctx : Context, attrs : AttributeSet) : super(ctx, attrs) {
         val a : TypedArray = ctx.obtainStyledAttributes(attrs, R.styleable.LinearGaugeView, 0, 0)
         emptyBarPaint.color = a.getColor(R.styleable.LinearGaugeView_emptyBarColor, Color.DKGRAY)
         filledBarPaint.color = a.getColor(R.styleable.LinearGaugeView_filledBarColor, Color.GRAY)
+        _curveControlPointX = a.getFloat(R.styleable.LinearGaugeView_curveControlPointX, 0.5f)
+        _curveControlPointY = a.getFloat(R.styleable.LinearGaugeView_curveControlPointY, 0.5f)
 
         a.recycle()
     }
@@ -62,7 +78,7 @@ class LinearGaugeView : GaugeView {
 
         path.reset()
         path.moveTo(left, bottom)
-        path.quadTo(right * .5f, bottom * 0.9f, right, top)
+        path.quadTo(right * _curveControlPointX, bottom * _curveControlPointY, right, top)
         path.lineTo(right, bottom)
         path.lineTo(left, bottom)
         path.close()
