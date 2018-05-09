@@ -20,6 +20,7 @@ class LinearGaugeView : GaugeView {
     override val currentNumberOffset: Float
         get() = if (_animating) _currentNumberAnim / _maxNumber.toFloat() else _currentNumber / _maxNumber.toFloat()
 
+    var enableAnimation: Boolean = false
     private var _animating = false
     private var _currentNumberAnim : Int = 0
 
@@ -81,6 +82,7 @@ class LinearGaugeView : GaugeView {
     }
 
     private fun animateFilledBar(current : Int, new : Int) {
+        if (!enableAnimation) return
         animator?.cancel()
         animator = ValueAnimator.ofInt(current, new)
         animator?.duration = 250
